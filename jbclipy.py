@@ -1,6 +1,6 @@
 import os,platform
 
-class JBMod():
+class JBCliPy():
 
     """Constructor"""    
     def __init__(self,username=None,password=None,win_suppress=False):
