@@ -56,6 +56,9 @@ class JBCliPy():
     def add_connector(self,name,protocol,scheme,socket_binding):
         self.commands.append('/subsystem=web/connector=%s:add(name=%s,protocol=%s,scheme=%s,socket-binding=%s)' % (name,name,protocol,scheme,socket_binding))
 
+    def remove_connector(self,name):
+        self.commands.append('/subsystem=web/connector=%s:remove()' % name)
+
     def add_console_handler(self,name,
                            autoflush=None,
                            encoding=None,
@@ -149,6 +152,52 @@ class JBCliPy():
     def add_handler_to_root_logger(self,name):
         self.commands.append('/subsystem=logging/root-logger=ROOT:root-logger-assign-handler(name="%s")' % name)
 
+
+    def add_jdbc_driver(self,name,module,xa_class=None):
+        s = '/subsystem=datasources/jdbc-driver=%s:add(driver-name=%s,driver-module-name=%s' % (name,name,module)
+
+        if xa_class:
+            s = s + ',driver-xa-datasource-class-name=%s)' % xa_class
+        else:
+            s = s + ')'
+
+        self.commands.append(s)
+
+    def remove_jdbc_driver(self,name):
+        self.commands.append('/subsystem=datasources/jdbc-driver=%s:remove()' % name)
+
+    def add_datasource(self,name,jndi,url,driver,username,password):
+        self.commands.append('/subsystem=datasources/data-source=%s:add(jndi-name="%s",connection-url="%s",driver-name="%s",user-name="%s",password="%s",use-java-context=true)' % (name,jndi,url,driver,username,password))
+
+    def remove_datasource(self,name):
+        self.commands.append('/subsystem=datasources/data-source=%s:remove()' % name)
+
+    def enable_datasource(self,name):
+        self.commands.append('/subsystem=datasources/data-source=%s:enable()' % name)
+
+    def disable_datasource(self,name):
+        self.commands.append('/subsystem=datasources/data-source=%s:disable()' % name)
+
+    def test_datasource(self,name):
+        self.commands.append('/subsystem=datasources/data-source=%s:test-connection-in-pool' % name)
+
+    def add_xa_datasource(self,name,jndi,url,driver,username,password):
+        self.commands.append('/subsystem=datasources/xa-data-source=%s:add(jndi-name="%s",connection-url="%s",driver-name="%s",user-name="%s",password="%s",use-java-context=true)' % (name,jndi,url,driver,username,password))
+
+    def remove_xa_datasource(self,name):
+        self.commands.append('/subsystem=datasources/xa-data-source=%s:remove()' % name)
+        
+    def enable_xa_datasource(self,name):
+        self.commands.append('/subsystem=datasources/xa-data-source=%s:enable()' % name)
+
+    def disable_xa_datasource(self,name):
+        self.commands.append('/subsystem=datasources/xa-data-source=%s:disable()' % name)
+
+    def test_xa_datasource(self,name):
+        self.commands.append('/subsystem=datasources/xa-data-source=%s:test-connection-in-pool' % name)
+
+
+
     """Bulk Methods"""        
     def remove_jgroups(self):
         self.remove_subsystem('jgroups')
@@ -207,3 +256,6 @@ class JBCliPy():
         self.remove_subsystem('jsr77')
         self.remove_extension('org.jboss.as.jsr77')
 
+    def remove_h2(self):
+        self.remove_datasource('ExampleDS')
+        self.remove_jdbc_driver('h2')
