@@ -32,10 +32,10 @@ class JBCliPy():
         self.commands = []
 
     def print_execution(self):
-        print self.connect.replace('<>',','.join(self.commands))
+        print(self.connect.replace('<>',','.join(self.commands)))
         
     def print_commands(self):
-        print ','.join(self.commands)
+        print(','.join(self.commands))
 
     """Build Methods"""
     def custom(self,cmd):
@@ -196,6 +196,8 @@ class JBCliPy():
     def test_xa_datasource(self,name):
         self.commands.append('/subsystem=datasources/xa-data-source=%s:test-connection-in-pool' % name)
 
+    def setup_vault(self,directory,url,password,alias,salt,iteration):
+        self.commands.append('/core-service=vault:add(vault-options=[KEYSTORE_URL=%s,KEYSTORE_PASSWORD=%s,KEYSTORE_ALIAS=%s,SALT=%s,ITERATION_COUNT=%s,ENC_FILE_DIR=%s])' % (url,password,alias,salt,iteration,directory))
 
 
     """Bulk Methods"""        
