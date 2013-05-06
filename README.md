@@ -17,6 +17,7 @@ Datasources are easy to manage.
 
     import jbclipy
 
+    # Create a JBCliPy instance
     jbcli = jbclipy.JBCliPy()
 
     #Remove the hypersonic database and driver
@@ -56,7 +57,7 @@ This example slims the standalone-full-ha.xml to standalone.xml. Simply start yo
 
     import jbclipy
 
-    # Create a JBMod instance
+    # Create a JBCliPy instance
     jbcli = jbclipy.JBCliPy()
 
     # Snapshot the current solution in case you need to revert
