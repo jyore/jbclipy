@@ -199,6 +199,11 @@ class JBCliPy():
     def setup_vault(self,directory,url,password,alias,salt,iteration):
         self.commands.append('/core-service=vault:add(vault-options=[KEYSTORE_URL=%s,KEYSTORE_PASSWORD=%s,KEYSTORE_ALIAS=%s,SALT=%s,ITERATION_COUNT=%s,ENC_FILE_DIR=%s])' % (url,password,alias,salt,iteration,directory))
 
+    def take_snapshot(self):
+        self.commands.append(':take-snapshot')
+
+    def delete_snapshot(self,name):
+        self.commands.append(':delete-snapshot(name=%s)' % name)
 
     """Bulk Methods"""        
     def remove_jgroups(self):
