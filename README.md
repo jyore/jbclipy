@@ -46,7 +46,7 @@ It is easier to slim a profile versus adding new subsystems.
 
 ####standalone-full-ha.xml to standalone.xml
 
-This example slims the standalone-full-ha.xml to standalone.xml. Simply start your JBoss instance using the standalone-full-ha.xml profile (MAKE SURE TO BACK UP THIS FILE FIRST) then run the following script
+This example slims the standalone-full-ha.xml to standalone.xml. Simply start your JBoss instance using the standalone-full-ha.xml profile then run the following script
 
     import os
     if 'JBOSS_HOME' not in os.environ:
@@ -58,6 +58,9 @@ This example slims the standalone-full-ha.xml to standalone.xml. Simply start yo
 
     # Create a JBMod instance
     jbcli = jbclipy.JBCliPy()
+
+    # Snapshot the current solution in case you need to revert
+    jbcli.take_snapshot()
 
     # Build a solution
     # This particular solution slims standalone-full-ha.xml to standalone.xml
