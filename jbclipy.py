@@ -205,6 +205,35 @@ class JBCliPy():
     def delete_snapshot(self,name):
         self.commands.append(':delete-snapshot(name=%s)' % name)
 
+
+    def add_jms_queue(self,name,entries,selector=None,durable=None):
+        s = '/subsystem=messaging/hornetq-server=default/jms-queue=%s:add(' % name
+        if entries:
+            s = s + 'entries=["' + '","'.join(entries) + '"]'
+        if selector:
+            s = s + ',selector=%s' % selector
+        if durable:
+            s = s + ',durable=%s' % durable
+
+        self.commands.append(s + ')')
+
+    def remove_jms_queue(self,name):
+        self.commands.append('/subsystem=messaging/hornetq-server=default/jms-queue=%s:remove()' % name)
+
+
+    def add_jms_topic(self,name,entries):
+        s = '/subsystem=messaging/hornetq-server=default/jms-topic=%s:add(' % name
+        if entries:
+            s = s + 'entries=["' + '","'.join(entries) + '"]'
+
+        self.commands.append(s + ')')
+
+    def remove_jms_topic(self,name):
+        self.commands.append('/subsystem=messaging/hornetq-server=default/jms-topic=%s:remove()' % name)
+
+
+
+
     """Bulk Methods"""        
     def remove_jgroups(self):
         self.remove_subsystem('jgroups')
