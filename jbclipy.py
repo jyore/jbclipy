@@ -1,38 +1,231 @@
-import os,platform
+import os,platform,json,subprocess
 
 class JBCliPy():
 
     """Constructor"""    
-    def __init__(self,username=None,password=None,win_suppress=False):
+    def __init__(self,username=None,password=None):
+
+        if platform.system() == 'Windows':
+            self.connect = [os.environ["JBOSS_HOME"] + '/bin/jboss-cli.bat', '-c']
+        else:
+            self.connect = [os.environ["JBOSS_HOME"] + '/bin/jboss-cli.sh', '-c']
 
         if username and password:
-            self.connect = ' --user='  + username + ' --password=' + password
-        else:
-            self.connect = ''
-            
-        if platform.system() == 'Windows':
-            self.connect = 'jboss-cli.bat -c' + self.connect + ' --commands=batch,<>,run-batch'
-            if win_suppress:
-                self.connect = ' < nul'
-        else:
-            self.connect = 'jboss-cli.sh -c' + self.connect + ' --commands=batch,<>,run-batch'
+            self.connect.append('--user=%s' % username)
+            self.connect.append('--password=%s' % password)
             
         self.commands = []
-    
+
+
+    """Utils"""
+    config_bases = {
+        'periodic-rotating-file-handler' : {
+            'file': {
+                'relative-to':'jboss.server.log.dir',
+                'path':'default.log'
+            }, 
+            'formatter':'%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n',
+            'level':'INFO',
+            'append':'true',
+            'suffix':'.yyyy-MM-dd',
+            'autoflush':None,
+            'encoding':None,
+            'filter':None
+        },
+        'size_-otating-file-handler' : {
+            'file': {
+                'relative-to':'jboss.server.log.dir',
+                'path':'default.log'
+            },            
+            'rotate_size':'',
+            'append':'true',
+            'formatter':'%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n',
+            'level':'INFO',
+            'max_backup_index':None,
+            'autoflush':None,
+            'encoding':None,
+            'filter':None
+        },
+        'console-handler' : {
+            'formatter':'%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n',
+            'level':'INFO',
+            'autoflush':None,
+            'encoding':None,
+            'filter':None,
+            'target':None
+        },
+        'logger' : {
+            'category':'',
+            'filter':'',
+            'handlers':[],
+            'level':'ALL',
+            'use-parent-handlers':''
+        },
+        'jdbc-driver' : {
+            'driver-module-name':'',
+            'driver-xa-datasource-class-name':None,
+            'deployment-name':None,
+            'driver-major-version':None,
+            'module-slot':None,
+            'driver-class-name':None,
+            'driver-minor-version':None,
+            'jdbc-compliant':None
+        },
+        'connector' : {
+            'protocol':'',
+            'scheme':'',
+            'socket-binding':'',
+            'enable-lookups':None,
+            'max-connections':None,
+            'proxy-port':None,
+            'secure':None,
+            'enabled':None,
+            'max-post-size':None,
+            'redirect-port':None,
+            'executor':None,
+            'max-save-post-size':None,
+            'proxy-name':None,
+            'virtual-server':None
+        },
+        'datasource' : {
+            'jndi-name':'',
+            'connection-url':'',
+            'driver-name':'',
+            'user-name':'',
+            'password':'',
+            'use-java-context':'true',
+            'allocation-retry-wait-millis':None,
+            'allocation-retry':None,
+            'allow-multiple-users':None,
+            'background-validation-millis':None,
+            'background-validation':None,
+            'blocking-timeout-wait-millis':None,
+            'check-valid-connection-sql':None,
+            'datasource-class':None,
+            'driver-class':None,
+            'exception-sorter-class-name':None,
+            'exception-sorter-properties':None,
+            'flush-strategy':None,
+            'idle-timeout-minutes':None,
+            'jndi-name':None,
+            'jta':None,
+            'max-pool-size':None,
+            'min-pool-size':None,
+            'new-connection-sql':None,
+            'pool-prefill':None,
+            'pool-use-strict-min':None,
+            'prepared-statements-cache-size':None,
+            'query-timeout':None,
+            'reauth-plugin-class-name':None,
+            'reauth-plugin-properties':None,
+            'security-domain':None,
+            'set-tx-query-timeout':None,
+            'share-prepared-statements':None,
+            'spy':None,
+            'stale-connection-checker-class-name':None,
+            'stale-connection-checker-properties':None,
+            'track-statements':None,
+            'transaction-isolation':None,
+            'url-delimiter':None,
+            'url-selector-strategy-class-name':None,
+            'use-ccm':None,
+            'use-fast-fail':None,
+            'use-try-lock':None,
+            'user-name':None,
+            'valid-connection-checker-class-name':None,
+            'valid-connection-checker-properties':None,
+            'validate-on-match':None
+        },
+        'xa-datasource' : {
+            'jndi-name':'',
+            'connection-url':'',
+            'driver-name':'',
+            'user-name':'',
+            'password':'',
+            'allocation-retry-wait-millis':None,
+            'allocation-retry':None,
+            'allow-multiple-users':None,
+            'background-validation-millis':None,
+            'background-validation':None,
+            'blocking-timeout-wait-millis':None,
+            'check-valid-connection-sql':None,
+            'exception-sorter-class-name':None,
+            'exception-sorter-properties':None,
+            'flush-strategy':None,
+            'idle-timeout-minutes':None,
+            'interleaving':None,
+            'jta':None,
+            'max-pool-size':None,
+            'min-pool-size':None,
+            'new-connection-sql':None,
+            'no-recovery':None,
+            'no-tx-separate-pool':None,
+            'pad-xid':None,
+            'pool-prefill':None,
+            'pool-use-strict-min':None,
+            'prepared-statements-cache-size':None,
+            'query-timeout':None,
+            'reauth-plugin-class-name':None,
+            'reauth-plugin-properties':None,
+            'recovery-password':None,
+            'recovery-plugin-class-name':None,
+            'recovery-plugin-properties':None,
+            'recovery-security-domain':None,
+            'recovery-username':None,
+            'same-rm-override':None,
+            'security-domain':None,
+            'set-tx-query-timeout':None,
+            'share-prepared-statements':None,
+            'spy':None,
+            'stale-connection-checker-class-name':None,
+            'stale-connection-checker-properties':None,
+            'track-statements':None,
+            'transaction-isolation':None,
+            'url-delimiter':None,
+            'url-selector-strategy-class-name':None,
+            'use-ccm':None,
+            'use-fast-fail':None,
+            'use-java-context':'true',
+            'use-try-lock':None,
+            'user-name':None,
+            'valid-connection-checker-class-name':None,
+            'valid-connection-checker-properties':None,
+            'validate-on-match':None,
+            'wrap-xa-resource':None,
+            'xa-datasource-class':None,
+            'xa-resource-timeout':None
+        }
+    }
+
+    def dict2params(self,dictionary):
+        s = ''
+        for key in dictionary:
+            if dictionary[key] == None:
+                pass  
+            elif isinstance(dictionary[key],dict):
+                s = s + ',' + key + '=%s' + json.dumps(dictionary[key],separators=(',','=>'))
+            elif isinstance(dictionary[key],list):
+                if len(dictionary[key]) > 0:
+                    s = s + ',' + key + '=["%s"]' % '","'.join(item for item in dictionary[key])
+                else:
+                    pass
+            else:
+                s = s + ',' + key + '="%s"' % dictionary[key]
+        return s
+
+    def get_base_config(self,base):
+        return self.config_bases[base]
 
     """User Actions"""
     def execute(self):
-        savedPath = os.getcwd()
-        os.chdir(os.environ["JBOSS_HOME"]+"/bin")
-        os.system(self.connect.replace('<>',','.join(self.commands)))
-        os.chdir(savedPath)
+        subprocess.call(self.connect + ['--commands=batch,%s,run-batch' % ','.join(self.commands)])
         self.reset()
 
     def reset(self):
         self.commands = []
 
     def print_execution(self):
-        print(self.connect.replace('<>',','.join(self.commands)))
+        print(' '.join(self.connect + ['--commands=batch,%s,run-batch' % ','.join(self.commands)]))
         
     def print_commands(self):
         print(','.join(self.commands))
@@ -40,6 +233,12 @@ class JBCliPy():
     """Build Methods"""
     def custom(self,cmd):
         self.commands.append(cmd)
+
+    def add_resource(self,base,params):
+        if isinstance(params,dict):
+            self.commands.append((base + self.dict2params(params) + ')').replace('(,','('))
+        else:
+            raise TypeError('Input [params] type should be a dictionary')
         
     def remove_subsystem(self,subsystem):
         self.commands.append('/subsystem=%s:remove()' % subsystem)
@@ -50,124 +249,53 @@ class JBCliPy():
     def remove_extension(self,extension):
         self.commands.append('/extension=%s:remove()' % extension)
 
+    def add_socket_binding(self):
+        pass
+
     def remove_socket_binding(self,binding):
         self.commands.append('/socket-binding-group=standard-sockets/socket-binding=%s:remove()' % binding)
 
-    def add_connector(self,name,protocol,scheme,socket_binding):
-        self.commands.append('/subsystem=web/connector=%s:add(name=%s,protocol=%s,scheme=%s,socket-binding=%s)' % (name,name,protocol,scheme,socket_binding))
+    def add_connector(self,name,params):
+        self.add_resource('/subsystem=web/connector=%s:add(name="%s"' % (name,name),params)
 
     def remove_connector(self,name):
         self.commands.append('/subsystem=web/connector=%s:remove()' % name)
 
-    def add_console_handler(self,name,
-                           autoflush=None,
-                           encoding=None,
-                           filter=None,
-                           formatter='%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n',
-                           level='INFO',
-                           target=None):
-        
-        s = '/subsystem=logging/console-handler=%s:add(name=%s' % (name,name)
-        if autoflush:
-            s = s + ',autoflash=' + autoflush
-        if encoding:
-            s = s + ',encoding=' + encoding
-        if filter:
-            s = s + ',filter=' + filter
-        if formatter:
-            s = s + ',formatter="%s"' % formatter
-        if level:
-            s = s + ',level=' + level
-        if target:
-            s = s + ',target=' + target
+    def add_console_handler(self,name,params):
+        self.add_resource('/subsystem=logging/console-handler=%s:add(name="%s"' % (name,name),params)
 
-        self.commands.append(s + ')')
+    def remove_console_handler(self,name):
+        self.commands.append('/subsystem=logging/console-handler=%s:remove()' % name)
 
+    def add_periodic_rotating_file_handler(self,name,params):
+        self.add_resource('/subsystem=logging/periodic_rotating_file_handler=%s:add(name="%s"' % (name,name),params)
 
-    def add_periodic_rotating_file_handler(self,name,
-                                           file,
-                                           append='true',
-                                           autoflush=None,
-                                           encoding=None,
-                                           filter=None,
-                                           formatter='%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n',
-                                           level='INFO',
-                                           suffix='.yyyy-MM-dd'):
+    def remove_periodic_rotating_file_handler(self,name):
+        self.commands.append('/subsystem=logging/periodic_rotating_file_handler=%s:remove()' % name)
 
-        s = '/subsystem=logging/periodic_rotating_file_handler=%s:add(name=%s,file={"relative-to"=>"%s","path"=>"%s"}' % (name,name,file[0],file[1])
-        if append:
-            s = s + ',append=' + append
-        if autoflash:
-            s = s + ',autoflush=' + autoflush
-        if encoding:
-            s = s + ',encoding=' + encoding
-        if filter:
-            s = s + ',filter=' + filter
-        if formatter:
-            s = s + ',formatter=' + formatter
-        if level:
-            s = s + ',level=' + level
-        if suffix:
-            s = s + ',suffix=' + suffix
+    def add_size_rotating_file_handler(self,name,params):
+        self.add_resource('/subsystem=logging/size_rotating_file_handler=%s:add(name="%s",',params)
 
-        self.commands.append(s + ')')
-                                           
+    def remove_size_rotating_file_handler(self,name):
+        self.commands.append('/subsystem=logging/size_rotating_file_handler=%s:remove()' % name)
 
-    def add_size_rotating_file_handler(self,name,
-                                       file,
-                                       rotate_size,
-                                       append='true',
-                                       autoflush=None,
-                                       encoding=None,
-                                       filter=None,
-                                       formatter='%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n',
-                                       level='INFO',
-                                       max_backup_index=None):
-                                       
-        s = '/subsystem=logging/size_rotating_file_handler=%s:add(name=%s,file={"relative-to"=>"%s","path"=>"%s"},rotate-size=%s' % (name,name,file[0],file[1],rotate_size)
-        if append:
-            s = s + ',append=' + append
-        if autoflash:
-            s = s + ',autoflush=' + autoflush
-        if encoding:
-            s = s + ',encoding=' + encoding
-        if filter:
-            s = s + ',filter=' + filter
-        if formatter:
-            s = s + ',formatter=' + formatter
-        if level:
-            s = s + ',level=' + level
-        if max_backup_index:
-            s = s + ',max-backup-index=' + max_backup_index
-
-        self.commands.append(s + ')')
-
-    def add_logger(self,name,handlers,level='ALL'):
-        s = '/subsystem=logging/logger=%s:add(level=%s,handlers=[' % (name,level)
-        for handler in handlers:
-            s = s + '"%s",' % handler
-        s = s[:-1] + '])'
-        self.commands.append(s)
+    def add_logger(self,name,params):
+        self.add_resource('/subsystem=logging/logger=%s:add(' % name,params)
 
     def add_handler_to_root_logger(self,name):
         self.commands.append('/subsystem=logging/root-logger=ROOT:root-logger-assign-handler(name="%s")' % name)
 
+    def remove_handler_from_root_logger(self,name):
+        self.commands.append('/subsystem=logging/root-logger=ROOT:root-logger-unassign-handler(name="%s")' % name)
 
-    def add_jdbc_driver(self,name,module,xa_class=None):
-        s = '/subsystem=datasources/jdbc-driver=%s:add(driver-name=%s,driver-module-name=%s' % (name,name,module)
-
-        if xa_class:
-            s = s + ',driver-xa-datasource-class-name=%s)' % xa_class
-        else:
-            s = s + ')'
-
-        self.commands.append(s)
-
+    def add_jdbc_driver(self,name,params):
+        self.add_resource('/subsystem=datasources/jdbc-driver=%s:add(driver-name="%s"' % (name,name),params)
+        
     def remove_jdbc_driver(self,name):
         self.commands.append('/subsystem=datasources/jdbc-driver=%s:remove()' % name)
-
-    def add_datasource(self,name,jndi,url,driver,username,password):
-        self.commands.append('/subsystem=datasources/data-source=%s:add(jndi-name="%s",connection-url="%s",driver-name="%s",user-name="%s",password="%s",use-java-context=true)' % (name,jndi,url,driver,username,password))
+    
+    def add_datasource(self,name,params):
+        self.add_resource('/subsystem=datasources/data-source=%s:add(' % (name),params)
 
     def remove_datasource(self,name):
         self.commands.append('/subsystem=datasources/data-source=%s:remove()' % name)
@@ -181,8 +309,8 @@ class JBCliPy():
     def test_datasource(self,name):
         self.commands.append('/subsystem=datasources/data-source=%s:test-connection-in-pool' % name)
 
-    def add_xa_datasource(self,name,jndi,url,driver,username,password):
-        self.commands.append('/subsystem=datasources/xa-data-source=%s:add(jndi-name="%s",connection-url="%s",driver-name="%s",user-name="%s",password="%s",use-java-context=true)' % (name,jndi,url,driver,username,password))
+    def add_xa_datasource(self,name,params):
+        self.add_resource('/subsystem=datasources/xa-data-source=%s:add(' % name, params)
 
     def remove_xa_datasource(self,name):
         self.commands.append('/subsystem=datasources/xa-data-source=%s:remove()' % name)
@@ -196,6 +324,7 @@ class JBCliPy():
     def test_xa_datasource(self,name):
         self.commands.append('/subsystem=datasources/xa-data-source=%s:test-connection-in-pool' % name)
 
+    #TODO: Convert to dictionary input
     def setup_vault(self,directory,url,password,alias,salt,iteration):
         self.commands.append('/core-service=vault:add(vault-options=[KEYSTORE_URL=%s,KEYSTORE_PASSWORD=%s,KEYSTORE_ALIAS=%s,SALT=%s,ITERATION_COUNT=%s,ENC_FILE_DIR=%s])' % (url,password,alias,salt,iteration,directory))
 
@@ -205,7 +334,7 @@ class JBCliPy():
     def delete_snapshot(self,name):
         self.commands.append(':delete-snapshot(name=%s)' % name)
 
-
+    #TODO: Convert to dictionary input
     def add_jms_queue(self,name,entries,selector=None,durable=None):
         s = '/subsystem=messaging/hornetq-server=default/jms-queue=%s:add(' % name
         if entries:
@@ -220,7 +349,7 @@ class JBCliPy():
     def remove_jms_queue(self,name):
         self.commands.append('/subsystem=messaging/hornetq-server=default/jms-queue=%s:remove()' % name)
 
-
+    #TODO: Convert to dictionary input
     def add_jms_topic(self,name,entries):
         s = '/subsystem=messaging/hornetq-server=default/jms-topic=%s:add(' % name
         if entries:
@@ -233,8 +362,7 @@ class JBCliPy():
 
 
 
-
-    """Bulk Methods"""        
+    """Bulk Methods""" 
     def remove_jgroups(self):
         self.remove_subsystem('jgroups')
         self.remove_extension('org.jboss.as.clustering.jgroups')
@@ -254,12 +382,11 @@ class JBCliPy():
         self.remove_modcluster()
 
     def add_ajp_connector(self,https=False):
-        if https:
-            scheme = 'https'
-        else:
-            scheme = 'http'
-        self.add_connector('ajp','AJP/1.3',scheme,'ajp')
-
+        self.add_connector('ajp',dict(self.get_base_config('connector'),**{
+            'protocol':'AJP/1.3',
+            'scheme':'https' if https else 'http',
+            'socket-binding': 'ajp'
+        }))
         
     def remove_messaging(self):
         self.remove_subsystem('messaging')

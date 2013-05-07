@@ -12,7 +12,7 @@ Datasources are easy to manage.
 
     import os
     if 'JBOSS_HOME' not in os.environ:
-	    print "Environment Variable: JBOSS_HOME must be defined"
+        print "Environment Variable: JBOSS_HOME must be defined"
         exit(-1)
 
     import jbclipy
@@ -24,16 +24,23 @@ Datasources are easy to manage.
     jbcli.remove_h2()
 
     #Add a driver (ironically the hypersonic one back)
-    jbcli.add_jdbc_driver('h2','com.h2database.h2','org.h2.jdbcx.JdbcDataSource')
+    jbcli.add_jdbc_driver('h2', {
+        'driver-module-name'              : 'com.h2database.h2',
+        'driver-xa-datasource-class-name' : 'org.h2.jdbcx.JdbcDataSource'
+    })
 
-    #Add a datasource (again, ironically the hypersonic one back)
-    jbcli.add_datasource('ExampleDS','java:jboss/datasources/ExampleDS','jdbc:h2:mem:test','h2','sa','sa')
+    #Add a datasource (again, ironically the hypersonic one back)  
+    jbcli.enable_datasource('ExampleDS', {
+        'jndi-name'        : 'java:jboss/datasources/ExampleDS',
+        'connection-url'   : 'jdbc:h2:mem:test;DB_CLOSE_DELAY=-1',
+        'driver-name'      : 'h2',
+        'user-name'        : 'sa',
+        'password'         : 'sa',
+        'use-java-context' : 'true'
+    })
 
     #Enable the datasource
     jbcli.enable_datasource('ExampleDS')
-
-    #Test the datasource connection
-    jbcli.test_datasource('ExampleDS')
 
     #Print execution string for veification
     jbcli.print_execution()
@@ -51,7 +58,7 @@ This example slims the standalone-full-ha.xml to standalone.xml. Simply start yo
 
     import os
     if 'JBOSS_HOME' not in os.environ:
-	    print "Environment Variable: JBOSS_HOME must be defined"
+        print "Environment Variable: JBOSS_HOME must be defined"
         exit(-1)
 
 
@@ -71,7 +78,7 @@ This example slims the standalone-full-ha.xml to standalone.xml. Simply start yo
     jbcli.remove_jacorb()
     jbcli.remove_jaxr()
     jbcli.remove_jsr77()
-    jbcli.add_console_handler('CONSOLE')
+    jbcli.add_console_handler('CONSOLE', jbcli.get_base_config('console-handler'))
     jbcli.add_handler_to_root_logger('CONSOLE')
 
     # Print the execution string for reference
