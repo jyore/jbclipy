@@ -1,10 +1,32 @@
 import os,platform,json,subprocess
 
 class JBCliPy():
+    """
+    Create a JBClipy Object, ready to use with or without authentication
 
-    """Constructor"""    
+    :param username: If authentication is required, the username to use
+    :type username: str
+    :param password: If authentication is required, the password to use
+    :type password: str
+
+
+
+    **No authentication example**
+
+    >>> cli = jbclipy.JBCliPy()
+    >>> print(cli.print_execution())
+    jboss-cli.sh -c --commands=batch,<commands>,run-batch
+
+    **Authentication example**
+
+    >>> cli = jbclipy.JBCliPy("username","password")
+    >>> print(cli.print_execution())
+    jboss-cli.sh -c --user=username --password=password --commands=batch,<commands>,run-batch
+
+    """
+    #Constructor
     def __init__(self,username=None,password=None):
-
+        
         if platform.system() == 'Windows':
             self.connect = [os.environ["JBOSS_HOME"] + '/bin/jboss-cli.bat', '-c']
         else:
@@ -17,8 +39,7 @@ class JBCliPy():
         self.commands = []
 
 
-    """Utils"""
-    config_bases = {
+    _config_bases = {
         'periodic-rotating-file-handler' : {
             'file': {
                 'relative-to':'jboss.server.log.dir',
@@ -197,7 +218,7 @@ class JBCliPy():
         }
     }
 
-    def dict2params(self,dictionary):
+    def _dict2params(self,dictionary):
         s = ''
         for key in dictionary:
             if dictionary[key] == None:
@@ -214,73 +235,136 @@ class JBCliPy():
         return s
 
     def get_base_config(self,base):
-        return self.config_bases[base]
+        return self._config_bases[base]
 
-    """User Actions"""
+    # User Actions
     def execute(self):
+        """
+        Call to execute commands batch
+        """
         subprocess.call(self.connect + ['--commands=batch,%s,run-batch' % ','.join(self.commands)])
         self.reset()
 
     def reset(self):
+        """
+        Removes all commands in the batch
+        """
         self.commands = []
 
     def print_execution(self):
+        """
+        Prints the execution string
+        """
         print(' '.join(self.connect + ['--commands=batch,%s,run-batch' % ','.join(self.commands)]))
-        
-    def print_commands(self):
-        print(','.join(self.commands))
 
-    """Build Methods"""
+    #Build Methods
     def custom(self,cmd):
+        """
+        Allows a user to add a custom command to the command list
+        
+        :param cmd: The command to add for execution
+        :type cmd: str
+        """
         self.commands.append(cmd)
 
-    def add_resource(self,base,params):
+    def _add_resource(self,base,params):
+        """
+        Private helper method to build command strings
+        """
         if isinstance(params,dict):
-            self.commands.append((base + self.dict2params(params) + ')').replace('(,','('))
+            self.commands.append((base + self._dict2params(params) + ')').replace('(,','('))
         else:
             raise TypeError('Input [params] type should be a dictionary')
         
     def remove_subsystem(self,subsystem):
+        """
+        Removes a subsystem from JBoss
+
+        :param subsystem: The name of the subsystem to remove
+        :type subsystem: str
+
+        Example of removing the modcluster subsystem::
+
+            cli = jbclipy.JBCliPy()
+            cli.remove_subsystem('modcluster')
+            cli.execute()
+
+        .. warning::
+            You should call :func:`remove_extension` in addition to removing the subsystem
+            
+        """
         self.commands.append('/subsystem=%s:remove()' % subsystem)
 
     def add_extension(self,extension):
+        """
+        Adds an extension to JBoss
+
+        :param extension: The name of the extension to add
+        :type extension: str
+
+        Example of adding the modcluster extension::
+
+            cli = jbclipy.JBCliPy()
+            cli.add_extension('modcluster')
+            cli.execute()
+            
+        .. note::
+            You should make sure that a subsystem is present before calling :func:`add_extension`
+            
+        """
         self.commands.append('/extension=%s:add()' % extension)
         
     def remove_extension(self,extension):
+        """
+        Removes an extension from JBoss
+
+        :param extension: The name of the extension to remove
+        :type extension: str
+
+        Example of removing the modcluster extension::
+
+            cli = jbclipy.JBCliPy()
+            cli.remove_extension('modcluster')
+            cli.execute()
+            
+        .. warning::
+            You should call :func:`remove_subsystem` before calling :func:`remove_extension`
+            
+        """
         self.commands.append('/extension=%s:remove()' % extension)
 
     def add_socket_binding(self):
-        pass
+        raise NotImplementedError('This method will be available at a future date')
 
     def remove_socket_binding(self,binding):
         self.commands.append('/socket-binding-group=standard-sockets/socket-binding=%s:remove()' % binding)
 
     def add_connector(self,name,params):
-        self.add_resource('/subsystem=web/connector=%s:add(name="%s"' % (name,name),params)
+        self._add_resource('/subsystem=web/connector=%s:add(name="%s"' % (name,name),params)
 
     def remove_connector(self,name):
         self.commands.append('/subsystem=web/connector=%s:remove()' % name)
 
     def add_console_handler(self,name,params):
-        self.add_resource('/subsystem=logging/console-handler=%s:add(name="%s"' % (name,name),params)
+        self._add_resource('/subsystem=logging/console-handler=%s:add(name="%s"' % (name,name),params)
 
     def remove_console_handler(self,name):
         self.commands.append('/subsystem=logging/console-handler=%s:remove()' % name)
 
     def add_periodic_rotating_file_handler(self,name,params):
-        self.add_resource('/subsystem=logging/periodic_rotating_file_handler=%s:add(name="%s"' % (name,name),params)
+        self._add_resource('/subsystem=logging/periodic_rotating_file_handler=%s:add(name="%s"' % (name,name),params)
 
     def remove_periodic_rotating_file_handler(self,name):
         self.commands.append('/subsystem=logging/periodic_rotating_file_handler=%s:remove()' % name)
 
     def add_size_rotating_file_handler(self,name,params):
-        self.add_resource('/subsystem=logging/size_rotating_file_handler=%s:add(name="%s",',params)
+        self._add_resource('/subsystem=logging/size_rotating_file_handler=%s:add(name="%s",',params)
 
     def remove_size_rotating_file_handler(self,name):
         self.commands.append('/subsystem=logging/size_rotating_file_handler=%s:remove()' % name)
 
     def add_logger(self,name,params):
-        self.add_resource('/subsystem=logging/logger=%s:add(' % name,params)
+        self._add_resource('/subsystem=logging/logger=%s:add(' % name,params)
 
     def add_handler_to_root_logger(self,name):
         self.commands.append('/subsystem=logging/root-logger=ROOT:root-logger-assign-handler(name="%s")' % name)
@@ -289,13 +373,13 @@ class JBCliPy():
         self.commands.append('/subsystem=logging/root-logger=ROOT:root-logger-unassign-handler(name="%s")' % name)
 
     def add_jdbc_driver(self,name,params):
-        self.add_resource('/subsystem=datasources/jdbc-driver=%s:add(driver-name="%s"' % (name,name),params)
+        self._add_resource('/subsystem=datasources/jdbc-driver=%s:add(driver-name="%s"' % (name,name),params)
         
     def remove_jdbc_driver(self,name):
         self.commands.append('/subsystem=datasources/jdbc-driver=%s:remove()' % name)
     
     def add_datasource(self,name,params):
-        self.add_resource('/subsystem=datasources/data-source=%s:add(' % (name),params)
+        self._add_resource('/subsystem=datasources/data-source=%s:add(' % (name),params)
 
     def remove_datasource(self,name):
         self.commands.append('/subsystem=datasources/data-source=%s:remove()' % name)
@@ -310,7 +394,7 @@ class JBCliPy():
         self.commands.append('/subsystem=datasources/data-source=%s:test-connection-in-pool' % name)
 
     def add_xa_datasource(self,name,params):
-        self.add_resource('/subsystem=datasources/xa-data-source=%s:add(' % name, params)
+        self._add_resource('/subsystem=datasources/xa-data-source=%s:add(' % name, params)
 
     def remove_xa_datasource(self,name):
         self.commands.append('/subsystem=datasources/xa-data-source=%s:remove()' % name)
