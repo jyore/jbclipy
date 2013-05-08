@@ -1,8 +1,9 @@
-jbclipy
-****************
+API Documentation
+*****************
+This page details the available methods and uses for jbclipy
+
 .. automodule:: jbclipy
 
-This page details the available methods and uses for jbclipy
 
 Constructors
 ============
