@@ -13,12 +13,14 @@ class JBCliPy():
 
     **No authentication example**
 
+    >>> import jbclipy
     >>> cli = jbclipy.JBCliPy()
     >>> print(cli.print_execution())
     jboss-cli.sh -c --commands=batch,<commands>,run-batch
 
     **Authentication example**
 
+    >>> import jbclipy
     >>> cli = jbclipy.JBCliPy("username","password")
     >>> print(cli.print_execution())
     jboss-cli.sh -c --user=username --password=password --commands=batch,<commands>,run-batch
@@ -219,6 +221,9 @@ class JBCliPy():
     }
 
     def _dict2params(self,dictionary):
+        """
+        Private method to conver dictionaries to parameter strings
+        """
         s = ''
         for key in dictionary:
             if dictionary[key] == None:
@@ -235,6 +240,9 @@ class JBCliPy():
         return s
 
     def get_base_config(self,base):
+        """
+        Returns a dictionary for the base config requested
+        """
         return self._config_bases[base]
 
     # User Actions
@@ -305,7 +313,7 @@ class JBCliPy():
         Example of adding the modcluster extension::
 
             cli = jbclipy.JBCliPy()
-            cli.add_extension('modcluster')
+            cli.add_extension('org.jboss.as.modcluster')
             cli.execute()
             
         .. note::
@@ -337,30 +345,73 @@ class JBCliPy():
         raise NotImplementedError('This method will be available at a future date')
 
     def remove_socket_binding(self,binding):
+        """
+        Removes a socket binding
+
+        :param binding: Name of the socket-binding to remove
+        :type bindind: str
+
+        .. warning::
+            You should only remove a socket binding that is not being referenced in any subsystems
+            
+        """
         self.commands.append('/socket-binding-group=standard-sockets/socket-binding=%s:remove()' % binding)
 
     def add_connector(self,name,params):
         self._add_resource('/subsystem=web/connector=%s:add(name="%s"' % (name,name),params)
 
     def remove_connector(self,name):
+        """
+        Removes a connector
+
+        :param name: Name of the connector to remove
+        :type name: str
+        """
         self.commands.append('/subsystem=web/connector=%s:remove()' % name)
 
     def add_console_handler(self,name,params):
         self._add_resource('/subsystem=logging/console-handler=%s:add(name="%s"' % (name,name),params)
 
     def remove_console_handler(self,name):
+        """
+        Removes a console handler
+
+        :param name: Name of the console handler to remove
+        :type name: str
+
+        .. warning::
+            You must make sure the handler is not part of a logger or root logger to remove
+        """
         self.commands.append('/subsystem=logging/console-handler=%s:remove()' % name)
 
     def add_periodic_rotating_file_handler(self,name,params):
         self._add_resource('/subsystem=logging/periodic_rotating_file_handler=%s:add(name="%s"' % (name,name),params)
 
     def remove_periodic_rotating_file_handler(self,name):
+        """
+        Removes a periodic rotating file handler
+
+        :param name: Name of the periodic rotating file handler to remove
+        :type name: str
+
+        .. warning::
+            You must make sure the handler is not part of a logger or root logger to remove
+        """
         self.commands.append('/subsystem=logging/periodic_rotating_file_handler=%s:remove()' % name)
 
     def add_size_rotating_file_handler(self,name,params):
         self._add_resource('/subsystem=logging/size_rotating_file_handler=%s:add(name="%s",',params)
 
     def remove_size_rotating_file_handler(self,name):
+        """
+        Removes a size rotating file handler
+
+        :param name: Name of the size rotating file handler to remove
+        :type name: str
+
+        .. warning::
+            You must make sure the handler is not part of a logger or root logger to remove
+        """
         self.commands.append('/subsystem=logging/size_rotating_file_handler=%s:remove()' % name)
 
     def add_logger(self,name,params):
@@ -370,42 +421,125 @@ class JBCliPy():
         self.commands.append('/subsystem=logging/root-logger=ROOT:root-logger-assign-handler(name="%s")' % name)
 
     def remove_handler_from_root_logger(self,name):
+        """
+        Removes a handler from the root logger
+
+        :param name: Name of the handler reference to remove
+        :type name: str
+
+        .. warning::
+            You must make sure the handler is not part of a logger or root logger to remove
+        """
         self.commands.append('/subsystem=logging/root-logger=ROOT:root-logger-unassign-handler(name="%s")' % name)
 
     def add_jdbc_driver(self,name,params):
         self._add_resource('/subsystem=datasources/jdbc-driver=%s:add(driver-name="%s"' % (name,name),params)
         
     def remove_jdbc_driver(self,name):
+        """
+        Removes a jdbc driver
+
+        :param name: Name of the driver to remove
+        :type name: str
+
+        .. warning::
+            You must remove any datasources using the driver before the driver can be removed.
+            See :func:`remove_datasource` and :func:`remove_xa_datasource`.
+        """
         self.commands.append('/subsystem=datasources/jdbc-driver=%s:remove()' % name)
     
     def add_datasource(self,name,params):
         self._add_resource('/subsystem=datasources/data-source=%s:add(' % (name),params)
 
     def remove_datasource(self,name):
+        """
+        Removes a datasource
+
+        :param name: Name of the datasource to remove
+        :type name: str
+        
+        """
         self.commands.append('/subsystem=datasources/data-source=%s:remove()' % name)
 
     def enable_datasource(self,name):
+        """
+        Enables a datasource for application use
+
+        :param name: The name of the datasource to enable
+        :type name: str
+
+        .. Note::
+            It is a good idea to run this command after :func:`add_datasource`
+        """
         self.commands.append('/subsystem=datasources/data-source=%s:enable()' % name)
 
     def disable_datasource(self,name):
+        """
+        Disables a datasource from application use
+
+        :param name: The name of the datasource to disable
+        :type name: str
+
+        .. Warning::
+            Applications **cannot** use a disabled datasource
+        """
         self.commands.append('/subsystem=datasources/data-source=%s:disable()' % name)
 
     def test_datasource(self,name):
+        """
+        Tests a datasource's connection
+
+        :param name: The name of the datasource to test
+        :type name: str
+
+        """
         self.commands.append('/subsystem=datasources/data-source=%s:test-connection-in-pool' % name)
 
     def add_xa_datasource(self,name,params):
         self._add_resource('/subsystem=datasources/xa-data-source=%s:add(' % name, params)
 
     def remove_xa_datasource(self,name):
+        """
+        Removes an xa-datasource
+
+        :param name: Name of the xa-datasource to remove
+        :type name: str
+        
+        """
         self.commands.append('/subsystem=datasources/xa-data-source=%s:remove()' % name)
         
     def enable_xa_datasource(self,name):
+        """
+        Enables an xa-datasource for application use
+
+        :param name: The name of the xa-datasource to enable
+        :type name: str
+
+        .. Note::
+            It is a good idea to run this command after :func:`add_xa_datasource`
+        """
         self.commands.append('/subsystem=datasources/xa-data-source=%s:enable()' % name)
 
     def disable_xa_datasource(self,name):
+        """
+        Disables an xa-datasource from application use
+
+        :param name: The name of the xa-datasource to disable
+        :type name: str
+
+        .. Warning::
+            Applications **cannot** use a disabled xa-datasource
+        """
         self.commands.append('/subsystem=datasources/xa-data-source=%s:disable()' % name)
 
     def test_xa_datasource(self,name):
+        """
+        Tests an xa-datasource's connection
+
+        :param name: The name of the xa-datasource to test
+        :type name: str
+
+        """
         self.commands.append('/subsystem=datasources/xa-data-source=%s:test-connection-in-pool' % name)
 
     #TODO: Convert to dictionary input
@@ -413,9 +547,22 @@ class JBCliPy():
         self.commands.append('/core-service=vault:add(vault-options=[KEYSTORE_URL=%s,KEYSTORE_PASSWORD=%s,KEYSTORE_ALIAS=%s,SALT=%s,ITERATION_COUNT=%s,ENC_FILE_DIR=%s])' % (url,password,alias,salt,iteration,directory))
 
     def take_snapshot(self):
+        """
+        Takes a snapshot of the current JBoss profile
+
+        .. Note::
+            This is highly recommended to do before adding/removing any resources
+        """
         self.commands.append(':take-snapshot')
 
     def delete_snapshot(self,name):
+        """
+        Deletes a stored snapshot
+
+        :param name: Name of the snapshot to delete
+        :type name: str
+
+        """
         self.commands.append(':delete-snapshot(name=%s)' % name)
 
     #TODO: Convert to dictionary input
@@ -431,6 +578,13 @@ class JBCliPy():
         self.commands.append(s + ')')
 
     def remove_jms_queue(self,name):
+        """
+        Removes a JMS Queue
+
+        :param name: Name of the queue to remove
+        :type name: str
+        
+        """
         self.commands.append('/subsystem=messaging/hornetq-server=default/jms-queue=%s:remove()' % name)
 
     #TODO: Convert to dictionary input
@@ -442,12 +596,34 @@ class JBCliPy():
         self.commands.append(s + ')')
 
     def remove_jms_topic(self,name):
+        """
+        Removes a JMS Topic
+
+        :param name: Name of the topic to remove
+        :type name: str
+        
+        """
         self.commands.append('/subsystem=messaging/hornetq-server=default/jms-topic=%s:remove()' % name)
 
 
 
     """Bulk Methods""" 
     def remove_jgroups(self):
+        """
+        Removes the jgroups subsystem
+
+        Equivalent to::
+
+            cli = jbclipy.JBCliPy()
+            cli.remove_subsystem('jgroups')
+            cli.remove_extension('org.jboss.as.clustering.jgroups')
+            cli.remove_socket_binding('jgroups-mping')
+            cli.remove_socket_binding('jgroups-tcp')
+            cli.remove_socket_binding('jgroups-tcp-fd')
+            cli.remove_socket_binding('jgroups-udp')
+            cli.remove_socket_binding('jgroups-udp-fd')
+            
+        """
         self.remove_subsystem('jgroups')
         self.remove_extension('org.jboss.as.clustering.jgroups')
         self.remove_socket_binding('jgroups-mping')
@@ -457,15 +633,52 @@ class JBCliPy():
         self.remove_socket_binding('jgroups-udp-fd')
 
     def remove_modcluster(self):
+        """
+        Removes the modcluster subsystem
+
+        Equivalent to::
+
+            cli = jbclipy.JBCliPy()
+            cli.remove_subsystem('modcluster')
+            cli.remove_extension('org.jboss.as.modcluster')
+            cli.remove_socket_binding('modcluster')
+            
+        """
         self.remove_subsystem('modcluster')
         self.remove_extension('org.jboss.as.modcluster')
         self.remove_socket_binding('modcluster')
 
     def remove_clustering(self):
+        """
+        Removes all of Clustering (jgroups + modcluster)
+
+        Equivalent to::
+
+            cli = jbclipy.JBCliPy()
+            cli.remove_jgroups()
+            cli.remove_modcluster()
+            
+        """
         self.remove_jgroups()
         self.remove_modcluster()
 
     def add_ajp_connector(self,https=False):
+        """
+        Adds the AJP Connector
+
+        :param https: Use https if True, http if false
+        :type https: bool
+
+        Equivalent to::
+
+            cli = jbclipy.JBCliPy()
+            cli.add_connector('ajp',{
+                'protocol':'AJP/1.3',
+                'scheme':'http', #'https' if True
+                'socket-binding': 'ajp'
+            })
+            
+        """
         self.add_connector('ajp',dict(self.get_base_config('connector'),**{
             'protocol':'AJP/1.3',
             'scheme':'https' if https else 'http',
@@ -473,6 +686,19 @@ class JBCliPy():
         }))
         
     def remove_messaging(self):
+        """
+        Removes the messaging subsystem
+
+        Equivalent to::
+
+            cli = jbclipy.JBCliPy()
+            cli.remove_subsystem('messaging')
+            cli.remove_extension('org.jboss.as.messaging')
+            cli.remove_socket_binding('messaging')
+            cli.remove_socket_binding('messaging-group')
+            cli.remove_socket_binding('messaging-throughput')
+            
+        """
         self.remove_subsystem('messaging')
         self.remove_extension('org.jboss.as.messaging')
         self.remove_socket_binding('messaging')
@@ -481,28 +707,91 @@ class JBCliPy():
 
 
     def remove_mail(self):
+        """
+        Removes the mail subsystem
+
+        Equivalent to::
+
+            cli = jbclipy.JBCliPy()
+            cli.remove_subsystem('mail')
+            cli.remove_extension('org.jboss.as.mail')
+            cli.custom('/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=mail-smtp:remove()')
+            
+        """
         self.remove_subsystem('mail')
         self.remove_extension('org.jboss.as.mail')
         self.custom('/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=mail-smtp:remove()')
 
     def remove_cmp(self):
+        """
+        Removes the cmp subsystem
+
+        Equivalent to::
+
+            cli = jbclipy.JBCliPy()
+            cli.remove_subsystem('cmp')
+            cli.remove_extension('org.jboss.as.cmp')
+            
+        """
         self.remove_subsystem('cmp')
         self.remove_extension('org.jboss.as.cmp')
 
     def remove_jacorb(self):
+        """
+        Removes the jacorb subsystem
+
+        Equivalent to::
+
+            cli = jbclipy.JBCliPy()
+            cli.remove_subsystem('jacorb')
+            cli.remove_extension('org.jboss.as.jacorb')
+            cli.remove_socket_binding('jacorb')
+            cli.remove_socket_binding('jacorb-ssl')
+            
+        """
         self.remove_subsystem('jacorb')
         self.remove_extension('org.jboss.as.jacorb')
         self.remove_socket_binding('jacorb')
         self.remove_socket_binding('jacorb-ssl')
 
     def remove_jaxr(self):
+        """
+        Removes the JAXR subsystem
+
+        Equivalent to::
+
+            cli = jbclipy.JBCliPy()
+            cli.remove_subsystem('jaxr')
+            cli.remove_extension('org.jboss.as.jaxr')
+            
+        """
         self.remove_subsystem('jaxr')
         self.remove_extension('org.jboss.as.jaxr')
 
     def remove_jsr77(self):
+        """
+        Removes the JSR77 subsystem
+
+        Equivalent to::
+
+            cli = jbclipy.JBCliPy()
+            cli.remove_subsystem('jsr77')
+            cli.remove_extension('org.jboss.as.jsr77')
+            
+        """
         self.remove_subsystem('jsr77')
         self.remove_extension('org.jboss.as.jsr77')
 
     def remove_h2(self):
+        """
+        Removes the Hypersonic database and driver
+
+        Equivalent to::
+
+            cli = jbclipy.JBCliPy()
+            cli.remove_datasource('ExampleDS')
+            cli.remove_jdbc_driver('h2')
+            
+        """
         self.remove_datasource('ExampleDS')
         self.remove_jdbc_driver('h2')
