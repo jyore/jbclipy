@@ -9,16 +9,16 @@ Constructors
 ============
 Available constructors
 
-.. autoclass:: JBCliPy
+.. autoclass:: Configuration
 
 
 User Action Methods
 ===================
 These methods provide actions to users to interact with jbclipy
 
-.. automethod:: JBCliPy.execute
-.. automethod:: JBCliPy.reset
-.. automethod:: JBCliPy.print_execution
+.. automethod:: Configuration.execute
+.. automethod:: Configuration.reset
+.. automethod:: Configuration.print_execution
 
 Builder Methods
 ===============
@@ -41,60 +41,60 @@ These methods are used for adding resources. A resource can be added using these
 
 Use all defaults::
         
-    cli.add_something('name','required1')
+    conf.add_something('name','required1')
 
             
 Supply keyword args to override::
         
-    cli.add_something('name','required1',optional1='value',optional_2='value')
+    conf.add_something('name','required1',optional1='value',optional_2='value')
 
 
 Supply a dictionary for overrides::
         
-    cli.add_something('name','required1',{
+    conf.add_something('name','required1',{
         'optional1':'value',
         'optional-2':'value'
     })
 
 |  
 
-.. automethod:: JBCliPy.add_extension
-.. automethod:: JBCliPy.add_connector
-.. automethod:: JBCliPy.add_console_handler
+.. automethod:: Configuration.add_extension
+.. automethod:: Configuration.add_connector
+.. automethod:: Configuration.add_console_handler
 
 
 Remove Resources
 ----------------
 These methods are used for removing resources
 
-.. automethod:: JBCliPy.remove_subsystem
-.. automethod:: JBCliPy.remove_extension
-.. automethod:: JBCliPy.remove_socket_binding
-.. automethod:: JBCliPy.remove_connector
-.. automethod:: JBCliPy.remove_console_handler
-.. automethod:: JBCliPy.remove_periodic_rotating_file_handler
-.. automethod:: JBCliPy.remove_size_rotating_file_handler
-.. automethod:: JBCliPy.remove_handler_from_root_logger
-.. automethod:: JBCliPy.remove_jdbc_driver
-.. automethod:: JBCliPy.remove_datasource
-.. automethod:: JBCliPy.remove_xa_datasource
-.. automethod:: JBCliPy.remove_jms_queue
-.. automethod:: JBCliPy.remove_jms_topic
+.. automethod:: Configuration.remove_subsystem
+.. automethod:: Configuration.remove_extension
+.. automethod:: Configuration.remove_socket_binding
+.. automethod:: Configuration.remove_connector
+.. automethod:: Configuration.remove_console_handler
+.. automethod:: Configuration.remove_periodic_rotating_file_handler
+.. automethod:: Configuration.remove_size_rotating_file_handler
+.. automethod:: Configuration.remove_handler_from_root_logger
+.. automethod:: Configuration.remove_jdbc_driver
+.. automethod:: Configuration.remove_datasource
+.. automethod:: Configuration.remove_xa_datasource
+.. automethod:: Configuration.remove_jms_queue
+.. automethod:: Configuration.remove_jms_topic
 
 
 Additional Methods
 ------------------
 Additiona methods that do not fall under Adding or Removing Resources
 
-.. automethod:: JBCliPy.custom
-.. automethod:: JBCliPy.take_snapshot
-.. automethod:: JBCliPy.delete_snapshot
-.. automethod:: JBCliPy.enable_datasource
-.. automethod:: JBCliPy.disable_datasource
-.. automethod:: JBCliPy.test_datasource
-.. automethod:: JBCliPy.enable_xa_datasource
-.. automethod:: JBCliPy.disable_xa_datasource
-.. automethod:: JBCliPy.test_xa_datasource
+.. automethod:: Configuration.custom
+.. automethod:: Configuration.take_snapshot
+.. automethod:: Configuration.delete_snapshot
+.. automethod:: Configuration.enable_datasource
+.. automethod:: Configuration.disable_datasource
+.. automethod:: Configuration.test_datasource
+.. automethod:: Configuration.enable_xa_datasource
+.. automethod:: Configuration.disable_xa_datasource
+.. automethod:: Configuration.test_xa_datasource
 
 
 
@@ -105,17 +105,17 @@ These methods bundle series of commands together in order to easily perform a ta
 In order to completely remove the subsystem, one must make a call to :func:`remove_subsystem`, a call to :func:`remove_extension`, and 5 calls to :func:`remove_socket_binding`.  This can be tedious for a user to do, so the bulk method :func:`remove_jgroups` is provided to perform all of the actions needed in order to remove the jgroups subsystem.
 
 
-.. automethod:: JBCliPy.remove_jgroups
-.. automethod:: JBCliPy.remove_modcluster
-.. automethod:: JBCliPy.remove_clustering
-.. automethod:: JBCliPy.add_ajp_connector
-.. automethod:: JBCliPy.remove_messaging
-.. automethod:: JBCliPy.remove_mail
-.. automethod:: JBCliPy.remove_cmp
-.. automethod:: JBCliPy.remove_jacorb
-.. automethod:: JBCliPy.remove_jaxr
-.. automethod:: JBCliPy.remove_jsr77
-.. automethod:: JBCliPy.remove_h2
+.. automethod:: Configuration.remove_jgroups
+.. automethod:: Configuration.remove_modcluster
+.. automethod:: Configuration.remove_clustering
+.. automethod:: Configuration.add_ajp_connector
+.. automethod:: Configuration.remove_messaging
+.. automethod:: Configuration.remove_mail
+.. automethod:: Configuration.remove_cmp
+.. automethod:: Configuration.remove_jacorb
+.. automethod:: Configuration.remove_jaxr
+.. automethod:: Configuration.remove_jsr77
+.. automethod:: Configuration.remove_h2
 
 
 Utility Functions

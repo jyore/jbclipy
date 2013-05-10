@@ -1,6 +1,6 @@
 import os,platform,json,subprocess
 
-class JBCliPy():
+class Configuration():
     """
     Create a JBClipy Object, ready to use with or without authentication
 
@@ -14,25 +14,25 @@ class JBCliPy():
     **No authentication example**
 
     >>> import jbclipy
-    >>> cli = jbclipy.JBCliPy()
-    >>> print(cli.print_execution())
-    jboss-cli.sh -c --commands=batch,<commands>,run-batch
+    >>> conf = jbclipy.Configuration()
+    >>> print(conf.print_execution())
+    jboss-conf.sh -c --commands=batch,<commands>,run-batch
 
     **Authentication example**
 
     >>> import jbclipy
-    >>> cli = jbclipy.JBCliPy("username","password")
-    >>> print(cli.print_execution())
-    jboss-cli.sh -c --user=username --password=password --commands=batch,<commands>,run-batch
+    >>> conf = jbclipy.Configuration("username","password")
+    >>> print(conf.print_execution())
+    jboss-conf.sh -c --user=username --password=password --commands=batch,<commands>,run-batch
     |  
     """
     #Constructor
     def __init__(self,username=None,password=None):
         
         if platform.system() == 'Windows':
-            self.connect = [os.environ["JBOSS_HOME"] + '/bin/jboss-cli.bat', '-c']
+            self.connect = [os.environ["JBOSS_HOME"] + '/bin/jboss-conf.bat', '-c']
         else:
-            self.connect = [os.environ["JBOSS_HOME"] + '/bin/jboss-cli.sh', '-c']
+            self.connect = [os.environ["JBOSS_HOME"] + '/bin/jboss-conf.sh', '-c']
 
         if username and password:
             self.connect.append('--user=%s' % username)
@@ -119,9 +119,9 @@ class JBCliPy():
 
         Example of removing the modcluster subsystem::
 
-            cli = jbclipy.JBCliPy()
-            cli.remove_subsystem('modcluster')
-            cli.execute()
+            conf = jbclipy.Configuration()
+            conf.remove_subsystem('modcluster')
+            conf.execute()
 
         .. warning::
             You should call :func:`remove_extension` in addition to removing the subsystem
@@ -139,9 +139,9 @@ class JBCliPy():
 
         Example of adding the modcluster extension::
 
-            cli = jbclipy.JBCliPy()
-            cli.add_extension('org.jboss.as.modcluster')
-            cli.execute()
+            conf = jbclipy.Configuration()
+            conf.add_extension('org.jboss.as.modcluster')
+            conf.execute()
             
         .. note::
             You should make sure that a subsystem is present before calling :func:`add_extension`
@@ -159,9 +159,9 @@ class JBCliPy():
 
         Example of removing the modcluster extension::
 
-            cli = jbclipy.JBCliPy()
-            cli.remove_extension('modcluster')
-            cli.execute()
+            conf = jbclipy.Configuration()
+            conf.remove_extension('modcluster')
+            conf.execute()
             
         .. warning::
             You should call :func:`remove_subsystem` before calling :func:`remove_extension`
@@ -578,14 +578,14 @@ class JBCliPy():
 
         Equivalent to::
 
-            cli = jbclipy.JBCliPy()
-            cli.remove_subsystem('jgroups')
-            cli.remove_extension('org.jboss.as.clustering.jgroups')
-            cli.remove_socket_binding('jgroups-mping')
-            cli.remove_socket_binding('jgroups-tcp')
-            cli.remove_socket_binding('jgroups-tcp-fd')
-            cli.remove_socket_binding('jgroups-udp')
-            cli.remove_socket_binding('jgroups-udp-fd')
+            conf = jbclipy.Configuration()
+            conf.remove_subsystem('jgroups')
+            conf.remove_extension('org.jboss.as.clustering.jgroups')
+            conf.remove_socket_binding('jgroups-mping')
+            conf.remove_socket_binding('jgroups-tcp')
+            conf.remove_socket_binding('jgroups-tcp-fd')
+            conf.remove_socket_binding('jgroups-udp')
+            conf.remove_socket_binding('jgroups-udp-fd')
             
         |  
         """
@@ -603,10 +603,10 @@ class JBCliPy():
 
         Equivalent to::
 
-            cli = jbclipy.JBCliPy()
-            cli.remove_subsystem('modcluster')
-            cli.remove_extension('org.jboss.as.modcluster')
-            cli.remove_socket_binding('modcluster')
+            conf = jbclipy.Configuration()
+            conf.remove_subsystem('modcluster')
+            conf.remove_extension('org.jboss.as.modcluster')
+            conf.remove_socket_binding('modcluster')
             
         |  
         """
@@ -620,9 +620,9 @@ class JBCliPy():
 
         Equivalent to::
 
-            cli = jbclipy.JBCliPy()
-            cli.remove_jgroups()
-            cli.remove_modcluster()
+            conf = jbclipy.Configuration()
+            conf.remove_jgroups()
+            conf.remove_modcluster()
             
         |  
         """
@@ -638,8 +638,8 @@ class JBCliPy():
 
         Equivalent to::
 
-            cli = jbclipy.JBCliPy()
-            cli.add_connector('ajp','AJP/1.3','http','ajp')
+            conf = jbclipy.Configuration()
+            conf.add_connector('ajp','AJP/1.3','http','ajp')
             # http would be https if https field is true
             
         |  
@@ -652,12 +652,12 @@ class JBCliPy():
 
         Equivalent to::
 
-            cli = jbclipy.JBCliPy()
-            cli.remove_subsystem('messaging')
-            cli.remove_extension('org.jboss.as.messaging')
-            cli.remove_socket_binding('messaging')
-            cli.remove_socket_binding('messaging-group')
-            cli.remove_socket_binding('messaging-throughput')
+            conf = jbclipy.Configuration()
+            conf.remove_subsystem('messaging')
+            conf.remove_extension('org.jboss.as.messaging')
+            conf.remove_socket_binding('messaging')
+            conf.remove_socket_binding('messaging-group')
+            conf.remove_socket_binding('messaging-throughput')
             
         |  
         """
@@ -674,10 +674,10 @@ class JBCliPy():
 
         Equivalent to::
 
-            cli = jbclipy.JBCliPy()
-            cli.remove_subsystem('mail')
-            cli.remove_extension('org.jboss.as.mail')
-            cli.custom('/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=mail-smtp:remove()')
+            conf = jbclipy.Configuration()
+            conf.remove_subsystem('mail')
+            conf.remove_extension('org.jboss.as.mail')
+            conf.custom('/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=mail-smtp:remove()')
             
         |  
         """
@@ -691,9 +691,9 @@ class JBCliPy():
 
         Equivalent to::
 
-            cli = jbclipy.JBCliPy()
-            cli.remove_subsystem('cmp')
-            cli.remove_extension('org.jboss.as.cmp')
+            conf = jbclipy.Configuration()
+            conf.remove_subsystem('cmp')
+            conf.remove_extension('org.jboss.as.cmp')
             
         |  
         """
@@ -706,11 +706,11 @@ class JBCliPy():
 
         Equivalent to::
 
-            cli = jbclipy.JBCliPy()
-            cli.remove_subsystem('jacorb')
-            cli.remove_extension('org.jboss.as.jacorb')
-            cli.remove_socket_binding('jacorb')
-            cli.remove_socket_binding('jacorb-ssl')
+            conf = jbclipy.Configuration()
+            conf.remove_subsystem('jacorb')
+            conf.remove_extension('org.jboss.as.jacorb')
+            conf.remove_socket_binding('jacorb')
+            conf.remove_socket_binding('jacorb-ssl')
             
         |  
         """
@@ -725,9 +725,9 @@ class JBCliPy():
 
         Equivalent to::
 
-            cli = jbclipy.JBCliPy()
-            cli.remove_subsystem('jaxr')
-            cli.remove_extension('org.jboss.as.jaxr')
+            conf = jbclipy.Configuration()
+            conf.remove_subsystem('jaxr')
+            conf.remove_extension('org.jboss.as.jaxr')
             
         |  
         """
@@ -740,9 +740,9 @@ class JBCliPy():
 
         Equivalent to::
 
-            cli = jbclipy.JBCliPy()
-            cli.remove_subsystem('jsr77')
-            cli.remove_extension('org.jboss.as.jsr77')
+            conf = jbclipy.Configuration()
+            conf.remove_subsystem('jsr77')
+            conf.remove_extension('org.jboss.as.jsr77')
             
         |  
         """
@@ -755,9 +755,9 @@ class JBCliPy():
 
         Equivalent to::
 
-            cli = jbclipy.JBCliPy()
-            cli.remove_datasource('ExampleDS')
-            cli.remove_jdbc_driver('h2')
+            conf = jbclipy.Configuration()
+            conf.remove_datasource('ExampleDS')
+            conf.remove_jdbc_driver('h2')
             
         |  
         """

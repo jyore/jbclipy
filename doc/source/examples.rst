@@ -25,22 +25,22 @@ Add the handler::
     import jbclipy
 
     # Create an instance
-    cli = jbclipy.JBCliPy()
+    conf = jbclipy.Configuration()
 
     # Add the console handler CONSOLE
-    cli.add_console_handler('CONSOLE',{
+    conf.add_console_handler('CONSOLE',{
         'level' : 'INFO',
         'formatter' : '%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n'
     })
 
     # Execute
-    cli.execute()
+    conf.execute()
 
 Now, you will need to add this console to a logger.  Let's add it to the ROOT logger
 
 Add to root logger::
 
-    cli.add_handler_to_root_logger('CONSOLE')
+    conf.add_handler_to_root_logger('CONSOLE')
 
 The end result will have INFO level output printed to the CONSOLE
 
