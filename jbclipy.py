@@ -24,7 +24,7 @@ class JBCliPy():
     >>> cli = jbclipy.JBCliPy("username","password")
     >>> print(cli.print_execution())
     jboss-cli.sh -c --user=username --password=password --commands=batch,<commands>,run-batch
-
+    |  
     """
     #Constructor
     def __init__(self,username=None,password=None):
@@ -40,189 +40,10 @@ class JBCliPy():
             
         self.commands = []
 
-
-    _config_bases = {
-        'periodic-rotating-file-handler' : {
-            'file': {
-                'relative-to':'jboss.server.log.dir',
-                'path':'default.log'
-            }, 
-            'formatter':'%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n',
-            'level':'INFO',
-            'append':'true',
-            'suffix':'.yyyy-MM-dd',
-            'autoflush':None,
-            'encoding':None,
-            'filter':None
-        },
-        'size_-otating-file-handler' : {
-            'file': {
-                'relative-to':'jboss.server.log.dir',
-                'path':'default.log'
-            },            
-            'rotate_size':'',
-            'append':'true',
-            'formatter':'%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n',
-            'level':'INFO',
-            'max_backup_index':None,
-            'autoflush':None,
-            'encoding':None,
-            'filter':None
-        },
-        'console-handler' : {
-            'formatter':'%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n',
-            'level':'INFO',
-            'autoflush':None,
-            'encoding':None,
-            'filter':None,
-            'target':None
-        },
-        'logger' : {
-            'category':'',
-            'filter':'',
-            'handlers':[],
-            'level':'ALL',
-            'use-parent-handlers':''
-        },
-        'jdbc-driver' : {
-            'driver-module-name':'',
-            'driver-xa-datasource-class-name':None,
-            'deployment-name':None,
-            'driver-major-version':None,
-            'module-slot':None,
-            'driver-class-name':None,
-            'driver-minor-version':None,
-            'jdbc-compliant':None
-        },
-        'connector' : {
-            'protocol':'',
-            'scheme':'',
-            'socket-binding':'',
-            'enable-lookups':None,
-            'max-connections':None,
-            'proxy-port':None,
-            'secure':None,
-            'enabled':None,
-            'max-post-size':None,
-            'redirect-port':None,
-            'executor':None,
-            'max-save-post-size':None,
-            'proxy-name':None,
-            'virtual-server':None
-        },
-        'datasource' : {
-            'jndi-name':'',
-            'connection-url':'',
-            'driver-name':'',
-            'user-name':'',
-            'password':'',
-            'use-java-context':'true',
-            'allocation-retry-wait-millis':None,
-            'allocation-retry':None,
-            'allow-multiple-users':None,
-            'background-validation-millis':None,
-            'background-validation':None,
-            'blocking-timeout-wait-millis':None,
-            'check-valid-connection-sql':None,
-            'datasource-class':None,
-            'driver-class':None,
-            'exception-sorter-class-name':None,
-            'exception-sorter-properties':None,
-            'flush-strategy':None,
-            'idle-timeout-minutes':None,
-            'jndi-name':None,
-            'jta':None,
-            'max-pool-size':None,
-            'min-pool-size':None,
-            'new-connection-sql':None,
-            'pool-prefill':None,
-            'pool-use-strict-min':None,
-            'prepared-statements-cache-size':None,
-            'query-timeout':None,
-            'reauth-plugin-class-name':None,
-            'reauth-plugin-properties':None,
-            'security-domain':None,
-            'set-tx-query-timeout':None,
-            'share-prepared-statements':None,
-            'spy':None,
-            'stale-connection-checker-class-name':None,
-            'stale-connection-checker-properties':None,
-            'track-statements':None,
-            'transaction-isolation':None,
-            'url-delimiter':None,
-            'url-selector-strategy-class-name':None,
-            'use-ccm':None,
-            'use-fast-fail':None,
-            'use-try-lock':None,
-            'user-name':None,
-            'valid-connection-checker-class-name':None,
-            'valid-connection-checker-properties':None,
-            'validate-on-match':None
-        },
-        'xa-datasource' : {
-            'jndi-name':'',
-            'connection-url':'',
-            'driver-name':'',
-            'user-name':'',
-            'password':'',
-            'allocation-retry-wait-millis':None,
-            'allocation-retry':None,
-            'allow-multiple-users':None,
-            'background-validation-millis':None,
-            'background-validation':None,
-            'blocking-timeout-wait-millis':None,
-            'check-valid-connection-sql':None,
-            'exception-sorter-class-name':None,
-            'exception-sorter-properties':None,
-            'flush-strategy':None,
-            'idle-timeout-minutes':None,
-            'interleaving':None,
-            'jta':None,
-            'max-pool-size':None,
-            'min-pool-size':None,
-            'new-connection-sql':None,
-            'no-recovery':None,
-            'no-tx-separate-pool':None,
-            'pad-xid':None,
-            'pool-prefill':None,
-            'pool-use-strict-min':None,
-            'prepared-statements-cache-size':None,
-            'query-timeout':None,
-            'reauth-plugin-class-name':None,
-            'reauth-plugin-properties':None,
-            'recovery-password':None,
-            'recovery-plugin-class-name':None,
-            'recovery-plugin-properties':None,
-            'recovery-security-domain':None,
-            'recovery-username':None,
-            'same-rm-override':None,
-            'security-domain':None,
-            'set-tx-query-timeout':None,
-            'share-prepared-statements':None,
-            'spy':None,
-            'stale-connection-checker-class-name':None,
-            'stale-connection-checker-properties':None,
-            'track-statements':None,
-            'transaction-isolation':None,
-            'url-delimiter':None,
-            'url-selector-strategy-class-name':None,
-            'use-ccm':None,
-            'use-fast-fail':None,
-            'use-java-context':'true',
-            'use-try-lock':None,
-            'user-name':None,
-            'valid-connection-checker-class-name':None,
-            'valid-connection-checker-properties':None,
-            'validate-on-match':None,
-            'wrap-xa-resource':None,
-            'xa-datasource-class':None,
-            'xa-resource-timeout':None
-        }
-    }
-
     def _dict2params(self,dictionary):
         """
         Private method to conver dictionaries to parameter strings
+        |  
         """
         s = ''
         for key in dictionary:
@@ -232,23 +53,20 @@ class JBCliPy():
                 s = s + ',' + key + '=%s' + json.dumps(dictionary[key],separators=(',','=>'))
             elif isinstance(dictionary[key],list):
                 if len(dictionary[key]) > 0:
-                    s = s + ',' + key + '=["%s"]' % '","'.join(item for item in dictionary[key])
+                    s = s + ',' + key.replace('_','-') + '=["%s"]' % '","'.join(item for item in dictionary[key])
                 else:
                     pass
             else:
                 s = s + ',' + key + '="%s"' % dictionary[key]
         return s
 
-    def get_base_config(self,base):
-        """
-        Returns a dictionary for the base config requested
-        """
-        return self._config_bases[base]
 
     # User Actions
     def execute(self):
         """
         Call to execute commands batch
+        
+        |  
         """
         subprocess.call(self.connect + ['--commands=batch,%s,run-batch' % ','.join(self.commands)])
         self.reset()
@@ -256,12 +74,16 @@ class JBCliPy():
     def reset(self):
         """
         Removes all commands in the batch
+        
+        |  
         """
         self.commands = []
 
     def print_execution(self):
         """
         Prints the execution string
+        
+        |  
         """
         print(' '.join(self.connect + ['--commands=batch,%s,run-batch' % ','.join(self.commands)]))
 
@@ -272,12 +94,16 @@ class JBCliPy():
         
         :param cmd: The command to add for execution
         :type cmd: str
+        
+        |  
         """
         self.commands.append(cmd)
 
     def _add_resource(self,base,params):
         """
         Private helper method to build command strings
+        
+        |  
         """
         if isinstance(params,dict):
             self.commands.append((base + self._dict2params(params) + ')').replace('(,','('))
@@ -300,6 +126,7 @@ class JBCliPy():
         .. warning::
             You should call :func:`remove_extension` in addition to removing the subsystem
             
+        |  
         """
         self.commands.append('/subsystem=%s:remove()' % subsystem)
 
@@ -319,6 +146,7 @@ class JBCliPy():
         .. note::
             You should make sure that a subsystem is present before calling :func:`add_extension`
             
+        |  
         """
         self.commands.append('/extension=%s:add()' % extension)
         
@@ -338,6 +166,7 @@ class JBCliPy():
         .. warning::
             You should call :func:`remove_subsystem` before calling :func:`remove_extension`
             
+        |  
         """
         self.commands.append('/extension=%s:remove()' % extension)
 
@@ -354,10 +183,71 @@ class JBCliPy():
         .. warning::
             You should only remove a socket binding that is not being referenced in any subsystems
             
+        |  
         """
         self.commands.append('/socket-binding-group=standard-sockets/socket-binding=%s:remove()' % binding)
 
-    def add_connector(self,name,params):
+    def add_connector(self,name,protocol,scheme,socket_binding,*args,**kwargs):
+        """
+        Add a connector
+
+        :param name: The name of the connector
+        :type name: str
+        :param protocol: The protocol to use
+        :type protocol: str
+        :param scheme: The scheme to direct traffic under
+        :type scheme: str
+        :param socket_binding: The name of the socket binding to use for traffic
+        :type socket_binding: str
+        :param args: An optional dictionary with default overrides
+        :type args: dict
+        :param kwargs: Instead of a dict, supply keyword args for optional parameters
+        :type kwargs: various
+        :raises: TypeError
+
+        |
+
+        **Optional Parameters:**
+        
+        +----------------+--------+-------------------------+-------------------------+
+        | Parameter Name |  Type  |         Default         |          Example        |
+        +================+========+=========================+=========================+
+        | enable-lookups |  str   |          None           |          'true'         |
+        +----------------+--------+-------------------------+-------------------------+
+        | max-connections|  str   |          None           |          '512'          |
+        +----------------+--------+-------------------------+-------------------------+
+        | proxy-port     |  str   |          None           |          '1234'         |
+        +----------------+--------+-------------------------+-------------------------+
+        | secure         |  str   |          None           |          'true'         |
+        +----------------+--------+-------------------------+-------------------------+
+        | enabled        |  str   |          None           |          'true'         |
+        +----------------+--------+-------------------------+-------------------------+
+        | redirect-port  |  str   |          None           |          '1234'         |
+        +----------------+--------+-------------------------+-------------------------+
+        | executor       |  str   |          None           |       'myExecutor'      |
+        +----------------+--------+-------------------------+-------------------------+
+        | max-post-size  |  str   |          None           |        '2097152'        |
+        +----------------+--------+-------------------------+-------------------------+
+        | max-save-post- |        |                         |                         |
+        | size           |  str   |          None           |         '4096'          |
+        +----------------+--------+-------------------------+-------------------------+
+        | proxy-name     |  str   |          None           |        'myProxy'        |
+        +----------------+--------+-------------------------+-------------------------+
+        | virtual-server |  list  |          None           |  ['server1','server2']  |
+        +----------------+--------+-------------------------+-------------------------+
+            
+        |  
+        """
+        params = {'protocol':protocol,'scheme':scheme,'socket-binding':socket_binding}
+
+        if len(args):
+            if isinstance(args[0],dict):
+                params.update(args[0])
+            else:
+                raise TypeError('argument must be a dictionary')
+        else:
+            params.update(kwargs)
+        
         self._add_resource('/subsystem=web/connector=%s:add(name="%s"' % (name,name),params)
 
     def remove_connector(self,name):
@@ -366,10 +256,60 @@ class JBCliPy():
 
         :param name: Name of the connector to remove
         :type name: str
+        
+        |  
         """
         self.commands.append('/subsystem=web/connector=%s:remove()' % name)
 
-    def add_console_handler(self,name,params):
+    def add_console_handler(self,name,*args,**kwargs):
+        """
+        Add a console handler
+
+        :param name: A name for the console handler
+        :type name: str
+        :param args: An optional dictionary with default overrides
+        :type args: dict
+        :param kwargs: Instead of a dict, supply keyword args for optional parameters
+        :type kwargs: various
+        :raises: TypeError
+
+        |
+
+        **Optional Parameters:**
+        
+        +----------------+--------+-------------------------+-------------------------+
+        | Parameter Name |  Type  |         Default         |          Example        |
+        +================+========+=========================+=========================+
+        | level          |  str   |         'INFO'          |          'DEBUG'        |
+        +----------------+--------+-------------------------+-------------------------+
+        | formatter      |  str   | '%d{HH:mm:ss,SSS}       | '%d{HH:mm:ss,SSS}       |
+        |                |        | %-5p [%c] (%t) %s%E%n'  | %-5p [%c] (%t) %s%E%n'  |
+        +----------------+--------+-------------------------+-------------------------+
+        | autoflush      |  str   |          None           |          'true'         |
+        +----------------+--------+-------------------------+-------------------------+
+        | encoding       |  str   |          None           |          'UTF-8'        |
+        +----------------+--------+-------------------------+-------------------------+
+        | filter         |  dict  |          None           | See :func:`make_filter` |
+        +----------------+--------+-------------------------+-------------------------+
+        | target         |  str   |       'System.out'      |       'Systen.err'      |
+        +----------------+--------+-------------------------+-------------------------+
+            
+        |  
+        """
+        params = {
+            'level':'INFO',
+            'formatter':'%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n',
+            'target':'System.out'
+        }
+
+        if len(args):
+            if isinstance(args[0],dict):
+                params.update(args[0])
+            else:
+                raise TypeError('argument must be a dictionary')
+        else:
+            params.update(kwargs)
+
         self._add_resource('/subsystem=logging/console-handler=%s:add(name="%s"' % (name,name),params)
 
     def remove_console_handler(self,name):
@@ -381,6 +321,8 @@ class JBCliPy():
 
         .. warning::
             You must make sure the handler is not part of a logger or root logger to remove
+            
+        |  
         """
         self.commands.append('/subsystem=logging/console-handler=%s:remove()' % name)
 
@@ -396,6 +338,8 @@ class JBCliPy():
 
         .. warning::
             You must make sure the handler is not part of a logger or root logger to remove
+            
+        |  
         """
         self.commands.append('/subsystem=logging/periodic_rotating_file_handler=%s:remove()' % name)
 
@@ -411,6 +355,8 @@ class JBCliPy():
 
         .. warning::
             You must make sure the handler is not part of a logger or root logger to remove
+            
+        |  
         """
         self.commands.append('/subsystem=logging/size_rotating_file_handler=%s:remove()' % name)
 
@@ -425,10 +371,9 @@ class JBCliPy():
         Removes a handler from the root logger
 
         :param name: Name of the handler reference to remove
-        :type name: str
-
-        .. warning::
-            You must make sure the handler is not part of a logger or root logger to remove
+        :type name: str,bool
+        
+        |  
         """
         self.commands.append('/subsystem=logging/root-logger=ROOT:root-logger-unassign-handler(name="%s")' % name)
 
@@ -445,6 +390,8 @@ class JBCliPy():
         .. warning::
             You must remove any datasources using the driver before the driver can be removed.
             See :func:`remove_datasource` and :func:`remove_xa_datasource`.
+            
+        |  
         """
         self.commands.append('/subsystem=datasources/jdbc-driver=%s:remove()' % name)
     
@@ -458,6 +405,7 @@ class JBCliPy():
         :param name: Name of the datasource to remove
         :type name: str
         
+        |  
         """
         self.commands.append('/subsystem=datasources/data-source=%s:remove()' % name)
 
@@ -470,6 +418,8 @@ class JBCliPy():
 
         .. Note::
             It is a good idea to run this command after :func:`add_datasource`
+
+        |  
         """
         self.commands.append('/subsystem=datasources/data-source=%s:enable()' % name)
 
@@ -482,6 +432,8 @@ class JBCliPy():
 
         .. Warning::
             Applications **cannot** use a disabled datasource
+            
+        |  
         """
         self.commands.append('/subsystem=datasources/data-source=%s:disable()' % name)
 
@@ -492,6 +444,7 @@ class JBCliPy():
         :param name: The name of the datasource to test
         :type name: str
 
+        |  
         """
         self.commands.append('/subsystem=datasources/data-source=%s:test-connection-in-pool' % name)
 
@@ -505,6 +458,7 @@ class JBCliPy():
         :param name: Name of the xa-datasource to remove
         :type name: str
         
+        |  
         """
         self.commands.append('/subsystem=datasources/xa-data-source=%s:remove()' % name)
         
@@ -517,6 +471,8 @@ class JBCliPy():
 
         .. Note::
             It is a good idea to run this command after :func:`add_xa_datasource`
+            
+        |  
         """
         self.commands.append('/subsystem=datasources/xa-data-source=%s:enable()' % name)
 
@@ -529,6 +485,8 @@ class JBCliPy():
 
         .. Warning::
             Applications **cannot** use a disabled xa-datasource
+            
+        |  
         """
         self.commands.append('/subsystem=datasources/xa-data-source=%s:disable()' % name)
 
@@ -539,6 +497,7 @@ class JBCliPy():
         :param name: The name of the xa-datasource to test
         :type name: str
 
+        |  
         """
         self.commands.append('/subsystem=datasources/xa-data-source=%s:test-connection-in-pool' % name)
 
@@ -552,6 +511,8 @@ class JBCliPy():
 
         .. Note::
             This is highly recommended to do before adding/removing any resources
+            
+        |  
         """
         self.commands.append(':take-snapshot')
 
@@ -562,6 +523,7 @@ class JBCliPy():
         :param name: Name of the snapshot to delete
         :type name: str
 
+        |  
         """
         self.commands.append(':delete-snapshot(name=%s)' % name)
 
@@ -584,6 +546,7 @@ class JBCliPy():
         :param name: Name of the queue to remove
         :type name: str
         
+        |  
         """
         self.commands.append('/subsystem=messaging/hornetq-server=default/jms-queue=%s:remove()' % name)
 
@@ -602,6 +565,7 @@ class JBCliPy():
         :param name: Name of the topic to remove
         :type name: str
         
+        |  
         """
         self.commands.append('/subsystem=messaging/hornetq-server=default/jms-topic=%s:remove()' % name)
 
@@ -623,6 +587,7 @@ class JBCliPy():
             cli.remove_socket_binding('jgroups-udp')
             cli.remove_socket_binding('jgroups-udp-fd')
             
+        |  
         """
         self.remove_subsystem('jgroups')
         self.remove_extension('org.jboss.as.clustering.jgroups')
@@ -643,6 +608,7 @@ class JBCliPy():
             cli.remove_extension('org.jboss.as.modcluster')
             cli.remove_socket_binding('modcluster')
             
+        |  
         """
         self.remove_subsystem('modcluster')
         self.remove_extension('org.jboss.as.modcluster')
@@ -658,6 +624,7 @@ class JBCliPy():
             cli.remove_jgroups()
             cli.remove_modcluster()
             
+        |  
         """
         self.remove_jgroups()
         self.remove_modcluster()
@@ -672,18 +639,12 @@ class JBCliPy():
         Equivalent to::
 
             cli = jbclipy.JBCliPy()
-            cli.add_connector('ajp',{
-                'protocol':'AJP/1.3',
-                'scheme':'http', #'https' if True
-                'socket-binding': 'ajp'
-            })
+            cli.add_connector('ajp','AJP/1.3','http','ajp')
+            # http would be https if https field is true
             
+        |  
         """
-        self.add_connector('ajp',dict(self.get_base_config('connector'),**{
-            'protocol':'AJP/1.3',
-            'scheme':'https' if https else 'http',
-            'socket-binding': 'ajp'
-        }))
+        self.add_connector('ajp','AJP/1.3','https' if https else 'http','ajp')
         
     def remove_messaging(self):
         """
@@ -698,6 +659,7 @@ class JBCliPy():
             cli.remove_socket_binding('messaging-group')
             cli.remove_socket_binding('messaging-throughput')
             
+        |  
         """
         self.remove_subsystem('messaging')
         self.remove_extension('org.jboss.as.messaging')
@@ -717,6 +679,7 @@ class JBCliPy():
             cli.remove_extension('org.jboss.as.mail')
             cli.custom('/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=mail-smtp:remove()')
             
+        |  
         """
         self.remove_subsystem('mail')
         self.remove_extension('org.jboss.as.mail')
@@ -732,6 +695,7 @@ class JBCliPy():
             cli.remove_subsystem('cmp')
             cli.remove_extension('org.jboss.as.cmp')
             
+        |  
         """
         self.remove_subsystem('cmp')
         self.remove_extension('org.jboss.as.cmp')
@@ -748,6 +712,7 @@ class JBCliPy():
             cli.remove_socket_binding('jacorb')
             cli.remove_socket_binding('jacorb-ssl')
             
+        |  
         """
         self.remove_subsystem('jacorb')
         self.remove_extension('org.jboss.as.jacorb')
@@ -764,6 +729,7 @@ class JBCliPy():
             cli.remove_subsystem('jaxr')
             cli.remove_extension('org.jboss.as.jaxr')
             
+        |  
         """
         self.remove_subsystem('jaxr')
         self.remove_extension('org.jboss.as.jaxr')
@@ -778,6 +744,7 @@ class JBCliPy():
             cli.remove_subsystem('jsr77')
             cli.remove_extension('org.jboss.as.jsr77')
             
+        |  
         """
         self.remove_subsystem('jsr77')
         self.remove_extension('org.jboss.as.jsr77')
@@ -792,6 +759,20 @@ class JBCliPy():
             cli.remove_datasource('ExampleDS')
             cli.remove_jdbc_driver('h2')
             
+        |  
         """
         self.remove_datasource('ExampleDS')
         self.remove_jdbc_driver('h2')
+
+
+def make_filter(self):
+    """
+    Makes a logging filter object
+
+    .. warning::
+        Method currently not availabale
+        
+    :returns: dict
+    :raises: NotImplementedError
+    """
+    raise NotImplementedError('This has not yet been implemented')

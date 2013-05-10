@@ -27,9 +27,40 @@ These methods provide actions to build a command list to send to JBoss, specific
 
 Add Resources
 -------------
-These methods are used for adding resources
+These methods are used for adding resources. A resource can be added using these methods with the following parameter scheme:
+
+* name: The name of the resource to add
+* required: Each required option gets its own parameter
+* optional: Optional parameters are passed via keyword args or dictionary
+
+.. note::
+    Optional parameters with hyphenated names (i.e. proxy-port), when passed as keyword arguments, should be passed using an underscore instead of a hyphen. So the keyword argument for `proxy-port` is `proxy_port`
+
+.. note::
+    Some Optional parameters have default values and others have `None`.  `None` values are ignored while the default values will be passed to JBoss.  See the method documentation for a list of optional parameters and their default values.
+
+Use all defaults::
+        
+    cli.add_something('name','required1')
+
+            
+Supply keyword args to override::
+        
+    cli.add_something('name','required1',optional1='value',optional_2='value')
+
+
+Supply a dictionary for overrides::
+        
+    cli.add_something('name','required1',{
+        'optional1':'value',
+        'optional-2':'value'
+    })
+
+|  
 
 .. automethod:: JBCliPy.add_extension
+.. automethod:: JBCliPy.add_connector
+.. automethod:: JBCliPy.add_console_handler
 
 
 Remove Resources
@@ -85,3 +116,9 @@ In order to completely remove the subsystem, one must make a call to :func:`remo
 .. automethod:: JBCliPy.remove_jaxr
 .. automethod:: JBCliPy.remove_jsr77
 .. automethod:: JBCliPy.remove_h2
+
+
+Utility Functions
+=================
+
+.. autofunction:: make_filter
