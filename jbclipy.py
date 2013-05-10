@@ -15,24 +15,25 @@ class Configuration():
 
     >>> import jbclipy
     >>> conf = jbclipy.Configuration()
-    >>> print(conf.print_execution())
-    jboss-conf.sh -c --commands=batch,<commands>,run-batch
+    >>> conf.print_execution()
+    jboss-cli.sh -c --commands=batch,<commands>,run-batch
 
     **Authentication example**
 
     >>> import jbclipy
     >>> conf = jbclipy.Configuration("username","password")
-    >>> print(conf.print_execution())
-    jboss-conf.sh -c --user=username --password=password --commands=batch,<commands>,run-batch
+    >>> conf.print_execution()
+    jboss-cli.sh -c --user=username --password=password --commands=batch,<commands>,run-batch
+
     |  
     """
     #Constructor
     def __init__(self,username=None,password=None):
         
         if platform.system() == 'Windows':
-            self.connect = [os.environ["JBOSS_HOME"] + '/bin/jboss-conf.bat', '-c']
+            self.connect = [os.environ["JBOSS_HOME"] + '/bin/jboss-cli.bat', '-c']
         else:
-            self.connect = [os.environ["JBOSS_HOME"] + '/bin/jboss-conf.sh', '-c']
+            self.connect = [os.environ["JBOSS_HOME"] + '/bin/jboss-cli.sh', '-c']
 
         if username and password:
             self.connect.append('--user=%s' % username)

@@ -19,11 +19,13 @@ First download Sphinx::
 
     $ sudo easy_install Sphinx
 
+
 Now, browse to the doc directory and run::
 
     $ make html
 
-This will build the html files for the documentation. Additionally, you could build a pdf
+
+This will build the html files for the documentation. Additionally, you could build a pdf::
 
     $ make latexpdf
 
@@ -73,7 +75,7 @@ You can now script a command session to use with jbclipy. In this simple example
 Now, let's run our test::
 
     $ python test.py
-    /path/to/jboss/bin/jboss-conf.sh -c --commands=batch,:take-snapshot,/subsystem=datasources/data-source=ExampleDS:remove(),/subsystem=datasources/jdbc-driver=h2:remove(),run-batch
+    /path/to/jboss/bin/jboss-cli.sh -c --commands=batch,:take-snapshot,/subsystem=datasources/data-source=ExampleDS:remove(),/subsystem=datasources/jdbc-driver=h2:remove(),run-batch
 
 The commands should execute now.  You should be able to find a snapshot of your profile before the :func:`remove_h2` command was called.  You can check your current profile to ensure that the ExampleDS and the h2 driver were both removed from the project.
 

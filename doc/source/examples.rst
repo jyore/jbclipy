@@ -28,10 +28,7 @@ Add the handler::
     conf = jbclipy.Configuration()
 
     # Add the console handler CONSOLE
-    conf.add_console_handler('CONSOLE',{
-        'level' : 'INFO',
-        'formatter' : '%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n'
-    })
+    conf.add_console_handler('CONSOLE')
 
     # Execute
     conf.execute()
