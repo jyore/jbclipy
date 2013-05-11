@@ -4,10 +4,14 @@ This page details the available methods and uses for jbclipy
 
 .. automodule:: jbclipy
 
+Configuration
++++++++++++++
+The Configuration class is to be used for configuring JBoss profiles.  
 
-Constructors
-============
-Available constructors
+
+Constructor
+===========
+Available constructor
 
 .. autoclass:: Configuration
 
@@ -118,7 +122,16 @@ In order to completely remove the subsystem, one must make a call to :func:`remo
 .. automethod:: Configuration.remove_h2
 
 
+Runtime
++++++++
+The Runtime class is used to get and set runtime information in JBoss.
+
+
 Utility Functions
-=================
++++++++++++++++++
+Utility functions are available to help make certain configurations easier.
 
 .. autofunction:: make_filter
+
+
+

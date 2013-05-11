@@ -2,7 +2,7 @@ import os,platform,json,subprocess
 
 class Configuration():
     """
-    Create a JBClipy Object, ready to use with or without authentication
+    Create a Configuration instance, ready to use with or without authentication
 
     :param username: If authentication is required, the username to use
     :type username: str
@@ -24,6 +24,10 @@ class Configuration():
     >>> conf = jbclipy.Configuration("username","password")
     >>> conf.print_execution()
     jboss-cli.sh -c --user=username --password=password --commands=batch,<commands>,run-batch
+
+    .. Note::
+
+        On Windows, jbclipy will automatically be configured to use `jboss-cli.bat`
 
     |  
     """
@@ -69,7 +73,18 @@ class Configuration():
         
         |  
         """
-        subprocess.call(self.connect + ['--commands=batch,%s,run-batch' % ','.join(self.commands)])
+        if platform.system() == 'Windows':
+            name = r'C:\WINDOWS\TMP\execute.cli'
+        else:
+            name = r'/tmp/execute.cli'
+
+        fh = open(name,'w')
+
+        fh.write('batch\n%s\nrun-batch' % '\n'.join(self.commands))
+        fh.close()
+
+        subprocess.call(self.connect + ['--file='+name]) 
+        os.remove(name)
         self.reset()
 
     def reset(self):
