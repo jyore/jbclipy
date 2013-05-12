@@ -74,7 +74,7 @@ class Configuration():
         |  
         """
         if platform.system() == 'Windows':
-            name = r'C:\WINDOWS\TMP\execute.cli'
+            name = r'C:\WINDOWS\TEMP\execute.cli'
         else:
             name = r'/tmp/execute.cli'
 
